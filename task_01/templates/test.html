@@ -1,7 +1,37 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{{super()}}
+   {{super()}}
 <h2>text</h2>
-{% endblock %}
+   <div class="container text-center">
+       <form class="d-inline-block" style="max-width: 33%;">
+           <div class="form-group">
+               <label for="eventDate">Дата</label>
+               <input type="date" name="eventDate" class="form-control" placeholder="Дата события">
+           </div>
+           <div class="form-group">
+               <label for="eventName">Событие</label>
+               <input type="text" name="eventName" class="form-control" placeholder="Название события">
+           </div>
+           <div class="form-group">
+               <label for="eventDuration">Продолжительность</label>
+               <input type="number" name="eventDuration" class="form-control" placeholder="Продолжительность" min="1" max="24">
+           </div>
+           <button type="submit" class="btn btn-primary">Записать</button>
+       </form>
+   </div>
+<div class="input-group input-group-sm mb-3">
+  <span class="input-group-text" id="inputGroup-sizing-sm">Small</span>
+  <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+</div>
 
+<div class="input-group mb-3">
+  <span class="input-group-text" id="inputGroup-sizing-default">Default</span>
+  <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+</div>
+
+<div class="input-group input-group-lg">
+  <span class="input-group-text" id="inputGroup-sizing-lg">Large</span>
+  <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+</div>
+{% endblock %}
