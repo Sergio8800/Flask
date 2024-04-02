@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<img src="{{ url_for('static', filename='cat8.jpg') }}" alt="foto">
+<img src="{{ url_for('static', filename='img/cat8.jpg') }}" alt="foto">
+
+<form action="/submit" method="post">
+<input type="text" name="name" placeholder="Имя">
+<input type="submit" value="Отправить">
+</form>
+
+</body>
+</html>

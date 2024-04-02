@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/index/')
 def main_page():
-    return render_template('index.html', h1="Главная страница")
+    return render_template('base.html', h1="Главная страница")
 
 @app.route('/about_shoes/')
 def get_page_shoes():
