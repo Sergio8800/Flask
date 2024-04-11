@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Главная{% endblock %}
+{% block content %}
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top " style="background-color: #009688;" >
+      <div class="container">
+        <a class="navbar-brand" href="/">Рожки&Ножки</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Список домов<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/comp">Жалобы</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/req">Обращения к специалистам</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Page Heading -->
+        <h1 class="my-4">Список домов</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="row">
+                    {% for house in buildings %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100">
+                                {% if house.photo %}
+                                    <img class="card-img-top" src="{{ url_for('static', filename=house.photo) }}">
+                                {% else %}
+                                    <img class="card-img-top" src="{{ url_for('static', filename='img/placeholder.jpg') }}">
+                                    
+                                {% endif %}
+                                <div class="card-body">
+                                    <h4 class="card-title">
+                                        {{ house.name }}
+                                    </h4>
+                                    <p class="card-text">
+                                        <b>Адрес: </b> {{ house.adress }}
+                                        <br>
+                                        <b>Описание: </b>{{ house.descr }}
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <a class="btn btn-primary btn-block float-left" href="/house/{{house.id}}/comp/new" role="button">
+                                        Жалоба
+                                    </a>
+                                    <a class="btn btn-primary btn-block float-right" href="/house/{{house.id}}/req/new" role="button">
+                                        Заявка
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

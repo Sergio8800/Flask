@@ -1,0 +1,41 @@
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %} {% endblock %}- Рожки&Ножки</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/3-col-portfolio.css') }}" rel="stylesheet">
+
+  </head>
+
+  <body>
+    
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <footer class="py-5 footer" style="background-color: #009688;">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Рожки&Ножки 2018</p>
+      </div>
+    </footer>
+    <!-- /.container -->
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+  </body>
+
+</html>

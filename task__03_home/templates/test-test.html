@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container" style="color: red ">
+    <h5 class="card-title placeholder-glow">
+        <span class="placeholder col-6">Мы не нашли страницу: &laquo;{{ url }}&raquo;.</span>
+    </h5>
+    <p class="card-text placeholder-glow">
+        <span class="placeholder col-7"><a href="{{ url_for('index') }}"> >>на главную</a></span>
+
+    </p>
+</div>
+
+
+
+{% endblock %}

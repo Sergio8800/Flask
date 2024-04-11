@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{h1}}
+<div class="container text-center">
+       <a href="{{ url_for('index') }}"><h2>Добавить событие</h2></a>
+   </div>
+   <div class="mt-4">
+       <ul class="list-group">
+           {% for event in events %}
+               <li class="list-group-item">
+                   <p>event = !!! {{ event }}</p>
+               </li>
+           {% endfor %}
+       </ul>
+   </div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-block  p-2 bg-primary text-white my-5">
+ <form enctype="multipart/form-data" method="post">
+     <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+     <input type="text" name="name_goods" value={{post.title}} placeholder='name'>
+     <textarea name="discription" id="text" cols="30" rows="3">{{post.content}}</textarea>
+     <input type="file" name="photo" multiple accept="image/*,image/jpeg,image/jpg">
+
+     <button> Update goods </button>
+</form>
+</div>
+{% endblock %}
