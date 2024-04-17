@@ -179,17 +179,6 @@ def goods_create():
             # return filename
         else:
             return 'No file part in the request', 400
-        # flash('Форма успешно отправлена! Вы создали новый товар', 'success')
-        # if not request.form['name']:
-        #     flash('Введите имя!', 'danger')
-        #     return redirect(url_for('autoris'))
-        # else:
-        #     new_user = User(username=request.form['name'], email='example@mail.com')
-        #     User.query.delete() # <<<<<<<< без этого удаления не работает
-        #     db.session.add(new_user)
-        #     db.session.commit()
-        #     flash('Форма успешно отправлена! Вы залогинились, ваше имя сохранено', 'success')
-        # return redirect(url_for('goods_create'))
     context = all_goods()
     data_list = dict()
     for i in range(len(context['posts'])):
@@ -257,5 +246,4 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
-    # print(f'====={1%5}')
     app.run(debug=True)
