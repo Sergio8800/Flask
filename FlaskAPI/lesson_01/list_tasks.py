@@ -18,15 +18,16 @@ templates = Jinja2Templates(directory=".templates")
 
 
 class Tasks(BaseModel):
-    task_id : Optional[int]
+    task_id: Optional[int]
     task_name: str
     task_description: Optional[str] = None
+    task_check: bool
 
 
-task1 = Tasks(task_id=1, task_name="Task name 1", task_description=" task description 1")
-task2 = Tasks(task_id=2, task_name="Task name 2", task_description=" task description 33")
-task3 = Tasks(task_id=3, task_name="Task name 3", task_description=" task description 2424")
-task4 = Tasks(task_id=4, task_name="Task name 4", task_description=" task description 365324")
+task1 = Tasks(task_id=1, task_name="Task name 1", task_description=" task description 1", task_check=False)
+task2 = Tasks(task_id=2, task_name="Task name 2", task_description=" task description 33", task_check=False)
+task3 = Tasks(task_id=3, task_name="Task name 3", task_description=" task description 2424", task_check=False)
+task4 = Tasks(task_id=4, task_name="Task name 4", task_description=" task description 365324", task_check=False)
 
 tasks = [task3, task4, task1, task2]
 
@@ -71,6 +72,15 @@ async def update_task(task_id: int, task: Tasks):
         if task_id == tasks[i].task_id:
             tasks[i] = task
     return {"tasks_id": task_id, "task_update": task}
+
+@app.put("/tasks/{tasks_id}")
+async def update_task_check(task_id: int, task: Tasks):
+    logger.info(f'Отработал PUT CHECK запрос для tasks id = {task_id}.')
+    for i in range(len(tasks)):
+        if task_id == tasks[i].task_id:
+            tasks[i].task_check = task.task_check
+    return {"tasks_id": task_id, "task_update_check": task.task_check}
+
 
 @app.delete("/tasks/{tasks_id}")
 async def delete_task(task_id: int):
