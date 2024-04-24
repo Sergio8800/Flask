@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ super() }} - {{ title }}
+{% endblock %}
+{% block name %}Имя-{{name}} {% endblock %}
+{% block content %}
+
+<!--<form action="/" method="post">-->
+<!--    <div class="mb-3">-->
+<!--        <label for="exampleInputEmail1" class="form-label">Email address</label>-->
+<!--        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">-->
+<!--        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>-->
+<!--    </div>-->
+<!--    <div class="mb-3">-->
+<!--        <label for="exampleInputPassword1" class="form-label">Password</label>-->
+<!--        <input type="password" class="form-control" id="exampleInputPassword1">-->
+<!--    </div>-->
+<!--    <div class="mb-3 form-check">-->
+<!--        <input type="checkbox" class="form-check-input" id="exampleCheck1">-->
+<!--        <label class="form-check-label" for="exampleCheck1">Check me out</label>-->
+<!--    </div>-->
+<!--    <button type="submit" class="btn btn-primary">Submit</button>-->
+<!--</form>-->
+<h2 class="text-success"> {{name}} </h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% if name == 'NoName' %}
+<form action="/autoris_form/" method="post">
+    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+    <input type="text" name="name" placeholder="Имя">
+    <input type="password" name="password" placeholder="Пароль">
+    <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
+    <input type="submit" value="Отправить">
+</form>
+<h1>Login</h1>
+
+{% else %}
+<a href="/logout/" class="btn btn-primary">Выход</a>
+
+{% endif %}
+
+{% endblock %}

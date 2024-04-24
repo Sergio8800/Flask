@@ -79,7 +79,7 @@ def autoris():
 
 # @app.route('/index_autoris/')
 # def index_autoris():
-#     return render_template('index_autoris.html')
+#     return render_template('index_entre.html')
 
 
 @app.route('/logout/')

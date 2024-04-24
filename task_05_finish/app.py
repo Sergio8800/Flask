@@ -2,6 +2,7 @@ import base64
 import csv
 import io
 import random
+import email_validator
 from base64 import b64encode as enc64
 from base64 import b64decode as dec64
 from io import BytesIO
@@ -13,31 +14,32 @@ from flask import Flask, render_template, session, request, flash, make_response
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
-
 from werkzeug.utils import secure_filename
-
-from models import db, User, Post, LoginForm, RegistrationForm
+from models import db, User, Goods, LoginForm, RegistrationForm, Comment
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'mysecretkey'
 csrf = CSRFProtect(app)
 app.secret_key = b'5f214cacbd30c2ae4784b520f17912ae0d5d8c16ae98128e3f549546221265e4'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///events.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
-# db = SQLAlchemy(app)
 db.init_app(app)
 app.app_context().push()
 db.create_all()
 print('DB is OK')
 
 
-# name_from_cookie = "None"
-
 def get_cookie():
-    # global name_from_cookie
     name_from_cookie = request.cookies.get('name')
     return name_from_cookie
+
+
+def get_sessinon():
+    if 'username' in session:
+        name = session['username']
+    else:
+        name = 'NoName'
+    return name
 
 
 @app.route('/')
@@ -46,20 +48,20 @@ def index():
     # name = request.cookies.get('name')
     # parol = request.cookies.get('parol')
     # context = [name, parol]
-    if 'username' in session:
-        name = session['username']
-    else:
-        name = None
-    context1 = get_cookie()
-    return render_template('index.html', name=context1)
+    # if 'username' in session:
+    #     name = session['username']
+    # else:
+    #     name = None
+    # context1 = get_cookie()
+    return render_template('index.html', name=get_sessinon())
 
 
 @app.route('/catalog/')
 def catalog():
-    if 'username' in session:
-        name = session['username']
-    else:
-        name = None
+    # if 'username' in session:
+    #     name = session['username']
+    # else:
+    #     name = "NoName"
     directory = "./static/img/"
     files = []
     context = list()
@@ -74,7 +76,7 @@ def catalog():
         element = {"file": el, "text": txt}
         context.append(element)
     # print(context)
-    return render_template('catalog.html', context=context, name=name)
+    return render_template('catalog.html', context=context, name=get_sessinon())
 
 
 @app.route('/autoris_form/', methods=['GET', 'POST'])
@@ -85,28 +87,56 @@ def autoris():
             flash('Введите имя!', 'danger')
             return redirect(url_for('autoris'))
         else:
-            new_user = User(username=request.form['name'], email='example@mail.com')
-            User.query.delete()  # <<<<<<<< без этого удаления не работает
+            new_user = User(username=request.form['name'], email=request.form['email'],
+                            password=request.form['password'])
+            # User.query.delete()  # <<<<<<<< без этого удаления не работает
+            # session.pop('username', None)
+            # if 'email' in session:
+            #     session.pop('email', None)
             db.session.add(new_user)
             db.session.commit()
 
             flash('Форма успешно отправлена! Вы залогинились, ваше имя сохранено', 'success')
-        # Обработка данных формы
+            session['username'] = request.form.get('name') or 'NoName'
+            # name = request.form.get('name')
+            return render_template('autoris_form.html', name=session['username'])
+    # Обработка данных формы
+    # name = request.form.get('name')
+    # password = request.form.get('password')
+    # email = request.form.get('email')
+    # response = make_response(render_template('autoris_form.html', name=name))
+    # response.set_cookie("name", request.form['name'])
+    # response.headers['new_head'] = 'New value'
+    # session['username'] = request.form.get('name') or 'NoName'
 
-        name = request.form.get('name')
-        password = request.form.get('Password')
-        gender = request.form.get('Gender')
+    # name = request.form.get('name')
+    # return render_template('autoris_form.html', contex=response)
+    return render_template('autoris_form.html', name=get_sessinon())
 
-        response = make_response(render_template('autoris_form.html', name=name))
-        response.set_cookie("name", request.form['name'])
-        # response.headers['new_head'] = 'New value'
-        session['username'] = request.form.get('name') or 'NoName'
-        # name = request.form.get('name')
-        # return render_template('autoris_form.html', contex=response)
 
-        # return redirect(url_for('autoris'))
-        return response
-    return render_template('autoris_form.html', name=get_cookie())
+@app.route('/index_entre')
+def index_entre():
+    users = User.query.all()
+
+    # if not request.form['email'] and request.form['password']:
+    if not request.form.get("email") and request.form.get('password'):
+        flash('Введите данные регистрации!', 'danger')
+        return redirect(url_for('autoris'))
+    else:
+        # name = request.form['name']
+        # email = request.form['email']
+        email = request.form.get("email")
+        password = request.form.get("password")
+        # сверяем с базой
+        for el in users:
+            if el.username == email and el.password == password:
+                new_user = User(username=request.form['name'], email=request.form['email'],
+                                password=request.form['password'])
+                db.session.add(new_user)
+                db.session.commit()
+            print(session['username'], ' - ', session['email'])
+    return render_template('index_entre.html', name=get_sessinon())
+
 
 @app.route('/logout/')
 def logout():
@@ -116,17 +146,24 @@ def logout():
     response = make_response("delete")
     response.set_cookie('name', '', max_age=0)
     response.delete_cookie('name')
-    print(session.get('username'))
+    # print(session.get('username'))
     return redirect(url_for('autoris'))
 
+
+# код работает, но не используется.
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if request.method == 'POST' and form.validate():
         # Обработка данных из формы
+        name = form.name.data
         email = form.email.data
         password = form.password.data
-        print(email, password)
+        new_user = User(username=name, email=email, password=password)
+        User.query.delete()  # <<<<<<<< без этого удаления не работает
+        db.session.add(new_user)
+        db.session.commit()
+
     return render_template('register.html', form=form)
 
 
@@ -139,8 +176,10 @@ def too_large(e):
 @app.route('/users/')
 def all_users():
     users = User.query.all()
+    comment = Comment.query.all()
     print(users)
     context = {'users': users}
+    context2 = {'comment': comment}
     return render_template('users.html', **context)
 
 
@@ -149,8 +188,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/cat_auto/', methods=['GET', 'POST'])
@@ -158,9 +196,10 @@ def goods_create():
     if request.method == 'POST':
         title = request.form['name_goods']
         content = request.form['discription']
+        price = request.form['price']
         photo = request.files['photo']
         if 'photo' in request.files and allowed_file(photo.filename):
-            filename = secure_filename(photo.filename)
+            filename = secure_filename(photo.filename)  # для отсекания вирусов в фото
             k = str(random.randint(1000, 99000))
             img_way = filename.split('.')[0] + k + "." + filename.split('.')[1]
             # Сохраняем файл локально
@@ -171,46 +210,87 @@ def goods_create():
             with open(local_folder, 'rb') as image_file:
                 binary_data = image_file.read()
                 # Сохраняем изображение в базе данных
-                new_image = Post(title=title, content=content, img=binary_data, img_way=img_way)
+                new_image = Goods(title=title, content=content, price=price, img=binary_data, img_way=img_way)
                 db.session.add(new_image)
                 db.session.commit()
 
-            return redirect(url_for('goods_create'))
+            return redirect(url_for('goods_create', name=get_sessinon()))
             # return filename
         else:
             return 'No file part in the request', 400
     context = all_goods()
     data_list = dict()
     for i in range(len(context['posts'])):
-        image = base64.b64decode(context['posts'][i].img)
-
+        # image = base64.b64decode(context['posts'][i].img)
         pre_img = io.BytesIO(context['posts'][i].img)
         image = Image.open(pre_img)
         id = context['posts'][i].id
         title = context['posts'][i].title
         content = context['posts'][i].content
+        price = context['posts'][i].price
         img_way = context['posts'][i].img_way
 
-        data_list.update({"id": id, "title": title, "content": content,  'image': image, 'img_way': img_way})
+        data_list.update(
+            {"id": id, "title": title, "content": content, "price": price, 'image': image, 'img_way': img_way})
         print(data_list)
         # print(context['posts'])
         # context = {'posts': data_list}
-    return render_template('catalog_automatiq.html', name=get_cookie(), **context, data_list=data_list)
+    return render_template('catalog_automatiq.html', name=get_sessinon(), **context, data_list=data_list)
+
+@app.route('/catalog_work/', methods=['GET', 'POST'])
+def catalog_work():
+    context = all_goods()
+    data_list = dict()
+    for i in range(len(context['posts'])):
+        # image = base64.b64decode(context['posts'][i].img)
+        pre_img = io.BytesIO(context['posts'][i].img)
+        image = Image.open(pre_img)
+        id = context['posts'][i].id
+        title = context['posts'][i].title
+        content = context['posts'][i].content
+        price = context['posts'][i].price
+        img_way = context['posts'][i].img_way
+
+        data_list.update(
+            {"id": id, "title": title, "content": content, "price": price, 'image': image, 'img_way': img_way})
+    return render_template('catalog_work.html', name=get_sessinon(), **context, data_list=data_list)
+
+
+
+@app.route('/catalog_work/<int:id>/', methods=['GET', 'POST'])
+def catalog_work_add(id):
+    post = Goods.query.get_or_404(id)
+    name = User.query.get_or_404(id)
+    print(post.id, name)
+    # if (request.method == 'POST') and (name.username != "NoName"):
+    if request.method == 'POST':
+        print("entre")
+        # post.title = request.form['name_goods']
+        # post.content = request.form['discription']
+        new_comment = Comment(post_id=post.id, author_id=name.id)
+        db.session.add(new_comment)
+        db.session.commit()
+        flash(f'Вы добавили товар{post.title} в корзину', 'success')
+        return redirect(url_for('catalog_work'))
+    else:
+        print("not entre", name.username)
+        return render_template('catalog_work_add.html', post=post, name=name)
 
 
 def all_goods():
-    posts = Post.query.all()
+    posts = Goods.query.all()
     context = {'posts': posts}
     return context
 
 
 @app.route('/goods_up/<int:id>/', methods=['GET', 'POST'])
 def goods_update(id):
-    post = Post.query.get_or_404(id)
-    print(post)
+    post = Goods.query.get_or_404(id)
+    # print(post)
     if request.method == 'POST':
         post.title = request.form['name_goods']
         post.content = request.form['discription']
+        post.price = request.form['price']
         photo = request.files['photo']
         if 'photo' in request.files and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
@@ -230,9 +310,6 @@ def goods_update(id):
         return redirect(url_for('goods_create'))
     else:
         return render_template('update_goods.html', post=post)
-
-
-
 
 
 @app.errorhandler(404)
